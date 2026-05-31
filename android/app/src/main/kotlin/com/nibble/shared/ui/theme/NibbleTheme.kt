@@ -19,9 +19,7 @@ fun NibbleTheme(
 ) {
     val colors = if (darkTheme) darkColors() else lightColors()
 
-    CompositionLocalProvider(
-        LocalNibbleColors provides colors,
-    ) {
+    CompositionLocalProvider(LocalNibbleColors provides colors) {
         content()
     }
 }
