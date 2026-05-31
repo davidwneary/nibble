@@ -19,8 +19,7 @@ class CopilotAgent(BaseAgent):
 
     def dispatch(self, prompt: str, workspace: Path) -> AgentResult:
         """Run copilot in non-interactive mode with the given prompt."""
-        cmd = [
-            self.command,
+        cmd = shlex.split(self.command) + [
             "-p", prompt,
             "-C", str(workspace),
         ]

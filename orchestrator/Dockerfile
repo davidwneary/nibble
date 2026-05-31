@@ -37,9 +37,15 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
     && apt-get update && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
-# Copilot CLI (installed globally via npm)
-# The exact package may change — this installs the GitHub Copilot CLI agent
-RUN npm install -g @githubnext/github-copilot-cli 2>/dev/null || true
+# GitHub Copilot CLI binary (Linux x64)
+ARG COPILOT_VERSION=1.0.56
+RUN ARCH=$(dpkg --print-architecture) && \
+    if [ "$ARCH" = "amd64" ]; then COPILOT_ARCH="x64"; else COPILOT_ARCH="arm64"; fi && \
+    curl -fsSL "https://github.com/github/copilot-cli/releases/download/v${COPILOT_VERSION}/copilot-linux-${COPILOT_ARCH}.tar.gz" \
+    -o /tmp/copilot.tar.gz && \
+    tar -xzf /tmp/copilot.tar.gz -C /usr/local/bin && \
+    rm /tmp/copilot.tar.gz && \
+    chmod +x /usr/local/bin/copilot
 
 # Python orchestrator dependencies
 COPY requirements.txt /app/requirements.txt
@@ -68,6 +74,8 @@ RUN printf '#!/bin/bash\n\
 if [ -n "$GITHUB_TOKEN" ]; then\n\
   git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"\n\
   echo "$GITHUB_TOKEN" | gh auth login --with-token 2>/dev/null || true\n\
+  # Pre-download the Copilot CLI binary\n\
+  gh copilot --version 2>/dev/null || true\n\
 fi\n\
 exec "$@"\n' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
