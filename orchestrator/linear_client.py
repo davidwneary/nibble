@@ -155,3 +155,20 @@ class LinearClient:
             {"issueId": issue_id, "body": body},
         )
         logger.info(f"Commented on issue {issue_id}")
+
+    def get_issue_comments(self, issue_id: str) -> list[str]:
+        """Fetch all comments on an issue, ordered chronologically."""
+        data = self._query(
+            """
+            query($issueId: ID!) {
+                issue(id: $issueId) {
+                    comments(orderBy: createdAt) {
+                        nodes { body }
+                    }
+                }
+            }
+            """,
+            {"issueId": issue_id},
+        )
+        nodes = data.get("issue", {}).get("comments", {}).get("nodes", [])
+        return [node["body"] for node in nodes]

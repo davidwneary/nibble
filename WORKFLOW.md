@@ -10,12 +10,29 @@ workflow:
     type: linear
     project_slug: nibble-recipe-app
     poll_interval_seconds: 30
-    eligible_states: ["Todo"]
-    in_progress_state: "In Progress"
+    eligible_states: ["Todo", "Plan", "Implement", "In Review", "Deploy"]
+    in_progress_state: "Implement"
     handoff_states: ["In Review"]
     terminal_states: ["Done", "Cancelled"]
     comment_on_progress: true
     comment_on_blocker: true
+
+  stages:
+    plan:
+      agent_profile: copilot
+      auto_advance: true  # No human gate — advances to Implement automatically
+    implement:
+      agent_profile: copilot
+      screenshot_on_labels: ["ui", "frontend", "web"]
+    review:
+      agent_profile: copilot  # Same model, different prompt
+      max_cycles: 3
+      escalation_state: "In Review"  # Stays in Review for human attention
+    deploy:
+      auto_merge: true
+      merge_strategy: squash
+      delete_branch: true
+      monitor_ci: true
 
   agent:
     # Switch active agent: "copilot" or "codex"

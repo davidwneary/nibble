@@ -22,5 +22,6 @@ web/coverage/
 
 # Orchestrator
 orchestrator/__pycache__/
+orchestrator/**/__pycache__/
 orchestrator/*.pyc
 /workspaces/
