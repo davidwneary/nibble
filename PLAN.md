@@ -1,5 +1,8 @@
 # Recipe Management App - Requirements & Implementation Plan
 
+> **Development Methodology**: Agent-led development using OpenAI Symphony + Linear.
+> See [AGENT-SETUP.md](./AGENT-SETUP.md) for the harness setup plan that must be completed before app development begins.
+
 ## Overview
 
 A personal recipe management app (Android + Web) inspired by [Mela](https://mela.recipes/), focused on collecting, organizing, and viewing recipes from various sources. Single-user initially, with a path to multi-user support.
