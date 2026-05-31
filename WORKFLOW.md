@@ -53,7 +53,7 @@ workflow:
       timeout_minutes: 30
 
   repo:
-    url: git@github.com:davidwneary/nibble.git
+    url: https://github.com/davidwneary/nibble.git
     default_branch: main
     pr_target: main
     branch_format: "feat/{issue_key}-{slug}"

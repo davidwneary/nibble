@@ -57,9 +57,20 @@ WORKDIR /app
 # Create workspace directory
 RUN mkdir -p /workspaces
 
-# Git config for agent commits
+# Git config for agent commits + HTTPS token auth
 RUN git config --global user.name "Nibble Agent" \
     && git config --global user.email "agent@nibble.dev" \
     && git config --global init.defaultBranch main
+
+# Entrypoint script to configure git HTTPS auth from GITHUB_TOKEN
+RUN printf '#!/bin/bash\n\
+# Configure git to use GITHUB_TOKEN for HTTPS clones\n\
+if [ -n "$GITHUB_TOKEN" ]; then\n\
+  git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"\n\
+  echo "$GITHUB_TOKEN" | gh auth login --with-token 2>/dev/null || true\n\
+fi\n\
+exec "$@"\n' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 CMD ["python3", "orchestrator.py"]

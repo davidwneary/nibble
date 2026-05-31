@@ -10,7 +10,6 @@ services:
       SYMPHONY_WORKSPACE_ROOT: /workspaces
     volumes:
       - workspaces:/workspaces
-      - ${HOME}/.ssh:/root/.ssh:ro
       - ./WORKFLOW.md:/app/WORKFLOW.md:ro
       - ./AGENTS.md:/app/AGENTS.md:ro
     restart: unless-stopped
