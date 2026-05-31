@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-background: #FAFAFA;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F5F5F5;
+  --color-primary: #FF6B35;
+  --color-primary-hover: #E85A2A;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #6D6D72;
+  --color-text-tertiary: #AEAEB2;
+  --color-divider: #EAEAEB;
+  --color-success: #34C759;
+  --color-error: #FF3B30;
+  --color-warning: #FF9500;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #1C1C1E;
+    --color-surface: #2C2C2E;
+    --color-surface-hover: #3A3A3C;
+    --color-primary: #FF8F5E;
+    --color-primary-hover: #FFA070;
+    --color-text-primary: #F5F5F5;
+    --color-text-secondary: #8E8E93;
+    --color-text-tertiary: #636366;
+    --color-divider: #38383A;
+    --color-success: #30D158;
+    --color-error: #FF453A;
+    --color-warning: #FFD60A;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
