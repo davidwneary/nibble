@@ -11,6 +11,7 @@ When an issue enters the "Implement" state, this handler:
 
 import logging
 import re
+from pathlib import Path
 
 from agents.base import BaseAgent
 from config import OrchestratorConfig
@@ -125,6 +126,9 @@ class ImplementStage(BaseStage):
             result = self.agent.dispatch(prompt, workspace)
 
             if result.success and has_changes(workspace):
+                # Capture screenshots if this is a UI issue
+                self._capture_screenshots_if_needed(issue, workspace)
+
                 pushed = commit_and_push(workspace, issue)
                 if pushed:
                     pr_result = open_pr(
@@ -194,3 +198,23 @@ class ImplementStage(BaseStage):
             if "🔍 **Code Review" in comment:
                 return comment
         return ""
+
+    def _capture_screenshots_if_needed(self, issue: LinearIssue, workspace: Path) -> None:
+        """Capture and upload screenshots if issue has UI labels."""
+        from screenshot import capture_screenshots, should_capture_screenshots
+
+        if not should_capture_screenshots(issue.labels):
+            return
+
+        logger.info(f"[Implement] {issue.identifier}: Capturing UI screenshots...")
+        screenshots = capture_screenshots(workspace)
+        if screenshots:
+            # Post screenshot paths as a comment (images will be in the PR)
+            paths_str = "\n".join(f"- `{s.name}`" for s in screenshots)
+            self.comment(
+                issue,
+                f"📸 **UI Screenshots captured:**\n{paths_str}\n\n"
+                f"(See PR files for full images)",
+            )
+        else:
+            logger.info("No screenshots captured (Playwright not available or no web/ dir)")

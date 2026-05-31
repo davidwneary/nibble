@@ -45,6 +45,11 @@ RUN npm install -g @githubnext/github-copilot-cli 2>/dev/null || true
 COPY requirements.txt /app/requirements.txt
 RUN pip3 install --no-cache-dir -r /app/requirements.txt
 
+# Playwright + Chromium for web screenshots
+RUN pip3 install playwright \
+    && python3 -m playwright install chromium \
+    && python3 -m playwright install-deps chromium
+
 # Copy orchestrator source
 COPY . /app
 WORKDIR /app

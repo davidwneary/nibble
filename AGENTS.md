@@ -21,7 +21,7 @@
 ```
 nibble/
 ├── AGENTS.md              ← You are here. Read this first.
-├── WORKFLOW.md            ← Symphony orchestration config (DO NOT MODIFY)
+├── WORKFLOW.md            ← Orchestrator config (DO NOT MODIFY)
 ├── PLAN.md                ← High-level roadmap and requirements
 ├── AGENT-SETUP.md         ← Harness setup documentation
 ├── docs/                  ← Detailed specifications
@@ -61,11 +61,59 @@ nibble/
 │   │       │   └── ui/         ← Shared composables
 │   │       └── app/            ← App entry, navigation, DI
 │   └── build.gradle.kts
-├── supabase/              ← Supabase config and edge functions
-│   ├── migrations/
-│   └── functions/
-└── symphony/              ← Docker orchestration (DO NOT MODIFY)
+├── orchestrator/          ← Python orchestrator (DO NOT MODIFY)
+│   ├── orchestrator.py    ← Main daemon (stage dispatcher)
+│   ├── stages/            ← Stage handlers
+│   │   ├── todo.py        ← Advances to Plan
+│   │   ├── plan.py        ← Generates implementation plan
+│   │   ├── implement.py   ← TDD implementation + PR
+│   │   ├── review.py      ← Code review agent
+│   │   └── deploy.py      ← Merge + CI monitoring
+│   ├── agents/            ← Agent dispatch (Copilot/Codex)
+│   ├── linear_client.py
+│   ├── github_client.py
+│   └── Dockerfile
+└── supabase/              ← Supabase config and edge functions
+    ├── migrations/
+    └── functions/
 ```
+
+---
+
+## Development Workflow (Multi-Stage Pipeline)
+
+Issues flow through automated stages. As an agent, you'll be invoked at specific stages with stage-appropriate prompts.
+
+```
+Human writes issue → Todo → Plan → Implement → In Review ↔ Implement → Deploy → Done
+                      │        │        │            │                      │
+                  (auto)   (agent)  (agent)    (reviewer agent)        (auto-merge)
+```
+
+### Stage: Plan
+- **Your job**: Produce a structured implementation plan (no code!)
+- **Output**: Acceptance criteria, steps, files to change, assumptions, trade-offs
+- **Posted as**: Linear comment on the issue
+- **Then**: Auto-advances to Implement
+
+### Stage: Implement
+- **Your job**: Write code following TDD (red → green → refactor)
+- **Context**: You'll receive the plan from the Plan stage + any review feedback
+- **Output**: Working code with tests, committed and pushed
+- **Then**: PR is opened, issue moves to In Review
+
+### Stage: In Review (Reviewer Agent)
+- **Your job**: Review the PR diff against acceptance criteria
+- **Output**: APPROVED or CHANGES_REQUESTED with specific feedback
+- **If approved**: Issue advances to Deploy (auto-merge)
+- **If changes requested**: Issue returns to Implement (you'll get the feedback)
+- **Max cycles**: 3 review rounds, then escalated to human
+
+### What you should know
+- The **Plan** comment will be in the issue's comment thread — read it for context
+- If you're doing a **revision**, prior review feedback will be in your prompt
+- Your changes must pass lint + tests (CI will verify)
+- The reviewer agent checks: correctness, tests, security, conventions, completeness
 
 ---
 
@@ -259,7 +307,7 @@ supabase functions serve    # Test edge functions locally
 - ❌ Never skip writing tests
 - ❌ Never disable lint rules (fix the code instead)
 - ❌ Never commit secrets, API keys, or `.env` files
-- ❌ Never modify AGENTS.md, WORKFLOW.md, or symphony/ directory
+- ❌ Never modify AGENTS.md, WORKFLOW.md, or orchestrator/ directory
 - ❌ Never use Material Design components on Android (custom Mela-inspired design)
 - ❌ Never add dependencies without justification in the PR description
 - ❌ Never write implementation before a failing test (TDD is mandatory)
