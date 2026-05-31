@@ -19,3 +19,8 @@ android/local.properties
 .vscode/
 *.iml
 web/coverage/
+
+# Orchestrator
+orchestrator/__pycache__/
+orchestrator/*.pyc
+/workspaces/

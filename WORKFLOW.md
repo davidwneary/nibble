@@ -1,5 +1,6 @@
-# WORKFLOW.md — Symphony Orchestration Config
-# This file defines how Symphony dispatches agents for the Nibble project.
+# WORKFLOW.md — Orchestration Config
+# This file defines how the orchestrator dispatches agents for the Nibble project.
+# The orchestrator reads this file to determine agent type, polling behavior, and PR conventions.
 
 workflow:
   name: nibble
@@ -17,11 +18,22 @@ workflow:
     comment_on_blocker: true
 
   agent:
-    type: codex
-    model: codex
+    # Switch active agent: "copilot" or "codex"
+    active: copilot
     max_concurrent: 2
-    timeout_minutes: 30
     workspace_root: /workspaces
+
+    copilot:
+      command: copilot
+      flags: "--allow-all --autopilot"
+      model: claude-sonnet-4.5
+      timeout_minutes: 30
+
+    codex:
+      command: codex
+      flags: "--full-auto"
+      model: codex
+      timeout_minutes: 30
 
   repo:
     url: git@github.com:davidwneary/nibble.git
@@ -80,7 +92,7 @@ workflow:
       - "PLAN.md"
       - "AGENT-SETUP.md"
       - ".env"
-      - "symphony/**"
+      - "orchestrator/**"
 
     # Agents must not
     prohibited_actions:

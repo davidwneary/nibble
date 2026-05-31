@@ -1,0 +1,17 @@
+services:
+  orchestrator:
+    build:
+      context: ./orchestrator
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      SYMPHONY_POLL_INTERVAL: "30"
+      SYMPHONY_MAX_CONCURRENCY: "2"
+      SYMPHONY_WORKSPACE_ROOT: /workspaces
+    volumes:
+      - workspaces:/workspaces
+      - ${HOME}/.ssh:/root/.ssh:ro
+    restart: unless-stopped
+
+volumes:
+  workspaces:
