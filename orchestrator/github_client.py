@@ -152,6 +152,7 @@ def open_pr(
         "--title", title,
         "--body", body,
         "--base", pr_target,
+        "--head", get_branch_name(workspace),
     ]
     for label in labels:
         cmd.extend(["--label", label])

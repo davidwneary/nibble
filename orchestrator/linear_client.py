@@ -69,7 +69,7 @@ class LinearClient:
         team_id = self.resolve_team_id()
         data = self._query(
             """
-            query($teamId: String!) {
+            query($teamId: ID!) {
                 workflowStates(filter: { team: { id: { eq: $teamId } } }) {
                     nodes { id name }
                 }
@@ -93,7 +93,7 @@ class LinearClient:
 
         data = self._query(
             """
-            query($teamId: String!, $stateIds: [String!]!) {
+            query($teamId: ID!, $stateIds: [ID!]!) {
                 issues(filter: {
                     team: { id: { eq: $teamId } }
                     state: { id: { in: $stateIds } }
