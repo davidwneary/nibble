@@ -84,7 +84,13 @@ class OrchestratorConfig:
 def load_config(workflow_path: Optional[Path] = None) -> OrchestratorConfig:
     """Load config from WORKFLOW.md and environment variables."""
     if workflow_path is None:
-        workflow_path = Path("/workspaces/nibble/WORKFLOW.md")
+        # Check common locations in order
+        candidates = [
+            Path("/app/WORKFLOW.md"),           # Docker mount
+            Path("/workspaces/nibble/WORKFLOW.md"),  # Cloned workspace
+            Path("../WORKFLOW.md"),             # Local development
+        ]
+        workflow_path = next((p for p in candidates if p.exists()), candidates[0])
 
     config = OrchestratorConfig()
 
@@ -115,6 +121,10 @@ def load_config(workflow_path: Optional[Path] = None) -> OrchestratorConfig:
     workspace_override = os.environ.get("SYMPHONY_WORKSPACE_ROOT")
     if workspace_override:
         config.agent.workspace_root = workspace_override
+
+    repo_url_override = os.environ.get("REPO_URL")
+    if repo_url_override:
+        config.repo.url = repo_url_override
 
     return config
 
