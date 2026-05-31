@@ -160,7 +160,7 @@ class LinearClient:
         """Fetch all comments on an issue, ordered chronologically."""
         data = self._query(
             """
-            query($issueId: ID!) {
+            query($issueId: String!) {
                 issue(id: $issueId) {
                     comments(orderBy: createdAt) {
                         nodes { body }
