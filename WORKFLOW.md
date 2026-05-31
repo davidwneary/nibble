@@ -43,7 +43,6 @@ workflow:
     copilot:
       command: copilot
       flags: "--allow-all --autopilot"
-      model: claude-sonnet-4.5
       timeout_minutes: 30
 
     codex:

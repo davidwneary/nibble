@@ -14,5 +14,17 @@ services:
       - ./AGENTS.md:/app/AGENTS.md:ro
     restart: unless-stopped
 
+  copilot-shell:
+    image: nibble-orchestrator:latest
+    profiles: [shell]
+    stdin_open: true
+    tty: true
+    env_file: .env
+    environment:
+      REPO_URL: https://github.com/davidwneary/nibble.git
+    command: >-
+      bash -c "git clone $$REPO_URL /workspaces/nibble &&
+      exec gh copilot -- -C /workspaces/nibble --allow-all --model claude-sonnet-4.5"
+
 volumes:
   workspaces:

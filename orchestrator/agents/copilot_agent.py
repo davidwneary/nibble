@@ -5,6 +5,7 @@ Invokes the GitHub Copilot CLI in non-interactive mode:
 """
 
 import logging
+import os
 import shlex
 import subprocess
 from pathlib import Path
@@ -39,12 +40,20 @@ class CopilotAgent(BaseAgent):
         logger.debug(f"Command: {' '.join(cmd)}")
 
         try:
+            # Use COPILOT_GITHUB_TOKEN for Copilot API auth (may differ from
+            # GITHUB_TOKEN used for git/repo operations)
+            env = os.environ.copy()
+            copilot_token = os.environ.get("COPILOT_GITHUB_TOKEN")
+            if copilot_token:
+                env["GITHUB_TOKEN"] = copilot_token
+
             result = subprocess.run(
                 cmd,
                 cwd=workspace,
                 capture_output=True,
                 text=True,
                 timeout=self.timeout_seconds,
+                env=env,
             )
             success = result.returncode == 0
             if success:
